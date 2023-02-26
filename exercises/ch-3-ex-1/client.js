@@ -6,6 +6,7 @@ var querystring = require('querystring');
 var cons = require('consolidate');
 var randomstring = require("randomstring");
 var __ = require('underscore');
+const { response } = require("express");
 __.string = require('underscore.string');
 
 var app = express();
@@ -21,14 +22,9 @@ var authServer = {
 };
 
 // client information
-
-
-/*
- * Add the client information in here
- */
 var client = {
-	"client_id": "",
-	"client_secret": "",
+	"client_id": "oauth-client-1",
+	"client_secret": "oauth-client-secret-1",
 	"redirect_uris": ["http://localhost:9000/callback"]
 };
 
@@ -44,11 +40,18 @@ app.get('/', function (req, res) {
 });
 
 app.get('/authorize', function(req, res){
+	access_token = null;
+	state = randomstring.generate();
 
-	/*
-	 * Send the user to the authorization server
-	 */
+	var authorizeUrl = buildUrl(authServer.authorizationEndpoint, {
+		response_type: 'code',
+		client_id: client.client_id,
+		redirect_uris: client.redirect_uris[0],
+		state: state
+	})
 	
+	console.log('redirect')
+	res.redirect(authorizeUrl)
 });
 
 app.get('/callback', function(req, res){
